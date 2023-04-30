@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_SIZE 100
+
+int undo_stack[MAX_SIZE];
+int redo_stack[MAX_SIZE];
+int undo_top = -1;
+int redo_top = -1;
+
+void perform_operation(int value) {
+  if (undo_top == MAX_SIZE - 1) {
+    printf("Undo stack overflow\n");
+    return;
+  }
+  undo_stack[++undo_top] = value;
+  redo_top = -1;
+}
+
+void undo(int* value) {
+  if (undo_top == -1) {
+    printf("Nothing to undo\n");
+    return;
+  }
+  redo_stack[++redo_top] = *value;
+  *value = undo_stack[undo_top--];
+}
+
+void redo(int* value) {
+  if (redo_top == -1) {
+    printf("Nothing to redo\n");
+    return;
+  }
+  undo_stack[++undo_top] = *value;
+  *value = redo_stack[redo_top--];
+}
+
+int main() {
+  int value = 0;
+
+  perform_operation(1);
+  perform_operation(2);
+  perform_operation(3);
+
+  printf("Current value: %d\n", value);
+
+  undo(&value);
+  printf("After undo: %d\n", value);
+
+  undo(&value);
+  printf("After undo: %d\n", value);
+
+  redo(&value);
+  printf("After redo: %d\n", value);
+
+  redo(&value);
+  printf("After redo: %d\n", value);
+
+  return 0;
+}
